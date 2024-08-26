@@ -5,6 +5,7 @@
 
 #include <ostream>
 #include <string>
+#include <algorithm>
 
 namespace SVG {
 	inline void begin(std::ostream& os, double x, double y, double w, double h) {

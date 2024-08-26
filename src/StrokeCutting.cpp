@@ -283,7 +283,7 @@ Capture StrokeCut::cut_spirals(Capture const &capture, std::map<size_t, size_t> 
 
 			// Use a threshold near 1
 			// If it's nearly a round, cut it into 4 pieces
-			if (std::fabsf(turning_number) > 0.8) {
+			if (std::fabs(turning_number) > 0.8) {
 				size_t cut_step = (prev_ind + j) / 4;
 				for (size_t cut = 1; cut < 4 && prev_ind + cut * cut_step < j; cut++) {
 					cut_pos[prev_ind + cut * cut_step] = true;
