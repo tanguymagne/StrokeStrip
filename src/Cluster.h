@@ -39,7 +39,7 @@ struct Cluster {
 	};
 
 	std::vector<Stroke> strokes;
-	std::vector<std::vector<int>> non_overlapping_stroke_pairs;
+	std::vector<std::vector<int>> non_overlapping_stroke_pairs; // Record pairs of strokes with no common cross-sections
 	std::vector<XSec> xsecs;
 	bool periodic = false;
 

@@ -295,6 +295,9 @@ std::vector<glm::dvec2> Fitting::fit_tangents(const std::vector<Sample>& samples
 
 			// k_terms.emplace_back(scale * (vars[j].x - vars[i].x - samples[i].k * ortho.x));
 			// k_terms.emplace_back(scale * (vars[j].y - vars[i].y - samples[i].k * ortho.y));
+
+			// Last change mentioned in the paper 
+			// "we compensate for unreliable tangents and curvatures by setting the expected curvature kj to 0 in Eq. 17"
 			k_terms.emplace_back(scale * (vars[j].x - vars[i].x - 0.0 * ortho.x));
 			k_terms.emplace_back(scale * (vars[j].y - vars[i].y - 0.0 * ortho.y));
 		}

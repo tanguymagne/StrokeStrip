@@ -34,7 +34,7 @@ private:
 	struct PairOrientation {
 		int orientation;
 		double weight;
-		bool has_overlap;
+		bool has_overlap; //Record if the pair of strokes has common cross-sections
 	};
 	PairOrientation orient_stroke_pair(const Cluster::Stroke& a, const Cluster::Stroke& b);
 

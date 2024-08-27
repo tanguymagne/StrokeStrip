@@ -62,6 +62,7 @@ std::vector<int> StrokeOrientation::orient_cluster_strokes(Cluster& cluster) {
 			auto info = orient_stroke_pair(cluster.strokes[i], cluster.strokes[j]);
 			objective += info.weight * info.orientation * (vars[i] - vars[j]) * (vars[i] - vars[j]);
 
+			// Record pairs of strokes with no common cross-sections
 			if (!info.has_overlap) {
 				cluster.non_overlapping_stroke_pairs.push_back({(int)i, (int)j});
 			}
@@ -190,6 +191,10 @@ StrokeOrientation::PairOrientation StrokeOrientation::orient_stroke_pair(const C
 				policy_result.connection_dists = { endpoint_dist };
 				// result.weight = has_overlap ? 1e-2 : 1;
 				// std::cout << "result.weight: " << result.weight << std::endl;
+
+				// First change mentioned in the paper
+				// "given pairs of strokes with no common cross-sections we set the alignment score w^~_i,j to be a function of the 
+				// angle between the stroke tangents at the closest stroke endpoints using Eq. 11
 				result.weight = weight_for_angle(endpoint_angle) + 1e-1;
 				// std::cout << "new result.weight: " << result.weight << std::endl;
 			}

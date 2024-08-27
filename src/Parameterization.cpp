@@ -283,7 +283,8 @@ void Parameterization::params_from_xsecs(Cluster* cluster, bool initial, Cluster
 		}
 	}
 
-	// Add monotonicity constraints for non-overlapping stroke pairs
+	// second change mentioned in the paper, add monotonicity constraints for non-overlapping stroke pairs
+	// "we force the parameter values across such pairs of endpoints to satisfy monotonicity constraints"
 	for (std::vector<int> non_overlapping_pairs : cluster->non_overlapping_stroke_pairs) {
 		int i = non_overlapping_pairs[0];
 		int j = non_overlapping_pairs[1];
