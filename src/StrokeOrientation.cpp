@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <numeric>
 #include <future>
+#include <iostream>
 
 #include "SvgUtils.h"
 
@@ -47,7 +48,7 @@ void StrokeOrientation::flip_strokes(Input* input) {
 	}
 }
 
-std::vector<int> StrokeOrientation::orient_cluster_strokes(const Cluster& cluster) {
+std::vector<int> StrokeOrientation::orient_cluster_strokes(Cluster& cluster) {
 	GRBModel model(context.grb);
 	std::vector<GRBVar> vars;
 	vars.reserve(cluster.strokes.size());
@@ -60,6 +61,10 @@ std::vector<int> StrokeOrientation::orient_cluster_strokes(const Cluster& cluste
 		for (size_t j = i + 1; j < cluster.strokes.size(); ++j) {
 			auto info = orient_stroke_pair(cluster.strokes[i], cluster.strokes[j]);
 			objective += info.weight * info.orientation * (vars[i] - vars[j]) * (vars[i] - vars[j]);
+
+			if (!info.has_overlap) {
+				cluster.non_overlapping_stroke_pairs.push_back({(int)i, (int)j});
+			}
 
 			if (context.debug_viz) {
 				std::string color = std::string(info.orientation == 1 ? "rgba(0,255,0," : "rgba(255,0,0,") + std::to_string(std::min(1.0, info.weight * 10)) + std::string(")");
@@ -111,6 +116,8 @@ StrokeOrientation::PairOrientation StrokeOrientation::orient_stroke_pair(const C
 
 	bool has_overlap = std::any_of(overlaps_a.begin(), overlaps_a.end(), [](int i) { return i != -1; }) ||
 		std::any_of(overlaps_b.begin(), overlaps_b.end(), [](int i) { return i != -1; });
+	
+	result.has_overlap = has_overlap;
 
 	int policy = 0;
 	StrokeOrientation::PolicyResult policy_result = { {}, {}, {}, std::numeric_limits<double>::infinity() };
@@ -181,7 +188,10 @@ StrokeOrientation::PairOrientation StrokeOrientation::orient_stroke_pair(const C
 				policy_result.violations = {};
 				policy_result.connection_angles = { endpoint_angle };
 				policy_result.connection_dists = { endpoint_dist };
-				result.weight = has_overlap ? 1e-2 : 1;
+				// result.weight = has_overlap ? 1e-2 : 1;
+				// std::cout << "result.weight: " << result.weight << std::endl;
+				result.weight = weight_for_angle(endpoint_angle) + 1e-1;
+				// std::cout << "new result.weight: " << result.weight << std::endl;
 			}
 			else {
 				bool orig_angle_ok = endpoint_angle / M_PI * 180 < 180 - 40;

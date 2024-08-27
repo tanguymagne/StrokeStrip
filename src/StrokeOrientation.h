@@ -29,11 +29,12 @@ private:
 	std::vector<DebugLine> debug_lines;
 	void add_debug_line(DebugLine line);
 
-	std::vector<int> orient_cluster_strokes(const Cluster& cluster);
+	std::vector<int> orient_cluster_strokes(Cluster& cluster);
 
 	struct PairOrientation {
 		int orientation;
 		double weight;
+		bool has_overlap;
 	};
 	PairOrientation orient_stroke_pair(const Cluster::Stroke& a, const Cluster::Stroke& b);
 

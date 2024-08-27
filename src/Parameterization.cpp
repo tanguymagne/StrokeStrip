@@ -283,6 +283,45 @@ void Parameterization::params_from_xsecs(Cluster* cluster, bool initial, Cluster
 		}
 	}
 
+	// Add monotonicity constraints for non-overlapping stroke pairs
+	for (std::vector<int> non_overlapping_pairs : cluster->non_overlapping_stroke_pairs) {
+		int i = non_overlapping_pairs[0];
+		int j = non_overlapping_pairs[1];
+		auto& stroke_i = cluster->strokes[i];
+		auto& stroke_j = cluster->strokes[j];
+
+		// Find the two closest endpoint
+		double endpoint_dist = std::numeric_limits<double>::infinity();
+		int min_ti = 0; // \in { 0, 1 }
+		int min_tj = 0; // \in { 0, 1 }
+		for (int ti : { 0, 1 }) {
+			for (int tj : { 0, 1 }) {
+				double dist = glm::distance(stroke_i.points[ti * (stroke_i.points.size() - 1)], stroke_j.points[tj * (stroke_j.points.size() - 1)]);
+				if (dist < endpoint_dist) {
+					endpoint_dist = dist;
+					min_ti = ti;
+					min_tj = tj;
+				}
+			}
+		}
+
+		// Add constraint
+		if (min_ti == min_tj) {
+			// The two closest endpoints are on the same side of the strokes, do not enforce monotonicity
+			continue;
+		}
+		else {
+			if (min_ti == 0){
+				// The closest point on the stroke i is at the beginning of the stroke, its parameter should be greater than the closest point on the stroke j
+				model.addConstr(param_vars[i][min_ti * (stroke_i.points.size() - 1)] - param_vars[j][min_tj * (stroke_j.points.size() - 1)] >= 0.5 * endpoint_dist);
+			}
+			else {
+				// The closest point on the stroke i is at the end of the stroke, its parameter should be less than the closest point on the stroke j
+				model.addConstr(param_vars[j][min_tj * (stroke_j.points.size() - 1)] - param_vars[i][min_ti * (stroke_i.points.size() - 1)] >= 0.5 * endpoint_dist);
+			}
+		}
+	}
+
 	// 4. Boundary
 	if (cut) {
 		for (auto& pt : cut->points) {

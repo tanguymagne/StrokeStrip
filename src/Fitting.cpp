@@ -293,8 +293,10 @@ std::vector<glm::dvec2> Fitting::fit_tangents(const std::vector<Sample>& samples
 
 			double scale = samples[i].no_k ? 0.1 : 1.;
 
-			k_terms.emplace_back(scale * (vars[j].x - vars[i].x - samples[i].k * ortho.x));
-			k_terms.emplace_back(scale * (vars[j].y - vars[i].y - samples[i].k * ortho.y));
+			// k_terms.emplace_back(scale * (vars[j].x - vars[i].x - samples[i].k * ortho.x));
+			// k_terms.emplace_back(scale * (vars[j].y - vars[i].y - samples[i].k * ortho.y));
+			k_terms.emplace_back(scale * (vars[j].x - vars[i].x - 0.0 * ortho.x));
+			k_terms.emplace_back(scale * (vars[j].y - vars[i].y - 0.0 * ortho.y));
 		}
 	}
 
